@@ -1,0 +1,28 @@
+const admin = require('firebase-admin');
+// Imports the Google Cloud client libraries
+const vision = require('@google-cloud/vision');
+
+const serviceAccount2 = require('./cloudVisionAPIServiceAccountKey.json')
+//initialize admin SDK using serviceAcountKey
+admin.initializeApp({
+   credential: admin.credential.cert(serviceAccount2)
+});
+
+async function asyncImageTask() {
+   // Creates a client
+   const client = new vision.ImageAnnotatorClient();
+   //const resultDet = client.safeSearchDetection('./images/gratisography-cyber-kitty-1170x780.jpg')
+   const resultDet = client.safeSearchDetection('./images/nsfw.jpg')
+   return resultDet;
+}
+
+async function main() {
+   const docRef = await asyncImageTask().catch(error => console.error(error));
+   console.log('docRef:', docRef)
+   console.log('Adult:', docRef[0].safeSearchAnnotation.adult);
+   console.log('Spoof:', docRef[0].safeSearchAnnotation.spoof);
+   console.log('Medical:', docRef[0].safeSearchAnnotation.medical);
+   console.log('Violence:', docRef[0].safeSearchAnnotation.violence);
+}
+
+main();
